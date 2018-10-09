@@ -1,0 +1,27 @@
+\documentclass[a4paper]{report}
+
+\usepackage{fullpage} % Package to use full page
+\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\title{M3A49 Mathematical Biology}
+\author{James Tavernor}
+\date{09/10/2018}
+
+\graphicspath {{"Deterministic Populations/contents/"}{"Introduction/contents/"}}
+
+\begin{document}
+
+\maketitle
+
+\chapter{Introduction}
+\input{"Introduction/contents/ChapterContents.tex"}
+
+\chapter{Deterministic Populations}
+\input{"Deterministic Populations/contents/ChapterContents.tex"}
+
+\bibliographystyle{plain}
+\bibliography{bibliography.bib}
+\end{document}
