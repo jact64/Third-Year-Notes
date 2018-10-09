@@ -7,24 +7,29 @@ function print_usage() {
 }
 
 function create_makefile() {
-	cd "$1"                                                                          >> /dev/null
-	safe=$(echo $1 | sed 's/ /\\ /g')
-	echo "all: $safe.pdf"                                                            >> makefile
-	echo ""                                                                          >> makefile
-	echo "$safe.pdf: $safe.tex \$(shell find contents/ -type f | sed 's/ /\\\\ /g')" >> makefile
-	echo -e "\tmkdir -p aux/"                                                        >> makefile
-	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ $safe.tex"       >> makefile
-	echo -e "\tcp aux/$safe.pdf $safe.pdf"                                           >> makefile
-	echo -e "\trm -rf aux/"                                                          >> makefile
-	echo ""                                                                          >> makefile
-	echo "clean:"                                                                    >> makefile
-	echo -e "\trm -rf *.pdf aux/ *.log *.aux"                                        >> makefile
-	cd -                                                                             >> /dev/null
+	cd "$1"                                                                                              >> /dev/null
+	safe=$(echo $1 | sed 's/ /\\ /g') 
+	echo "all: $safe.pdf"                                                                                >> makefile
+	echo ""                                                                                              >> makefile
+	echo "$safe.pdf: $safe.tex \$(shell find contents/ -type f | sed 's/ /\\\\ /g')"                     >> makefile
+	echo -e "\tmkdir -p aux/"                                                                            >> makefile
+	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --interaction=nonstopmode $safe.tex" >> makefile
+	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --ubteraction=nonstopmode $safe.tex" >> makefile
+	echo -e "\tcp aux/$safe.pdf $safe.pdf"                                                               >> makefile
+	echo -e "\trm -rf aux/"                                                                              >> makefile
+	echo ""                                                                                              >> makefile
+	echo "clean:"                                                                                        >> makefile
+	echo -e "\trm -rf *.pdf aux/ *.log *.aux"                                                            >> makefile
+	cd -                                                                                                 >> /dev/null
 }
 
 function create_chapter_tex_file() {
 	cd "$1"                                                            >> /dev/null
-	echo "\\documentclass[a4paper]{article}"                           >> "$1.tex"
+	echo "\\documentclass[notitlepage]{article}"                       >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+        echo "\\makeatletter"                                              >> "$1.tex"
+	echo "\\newcommand*{\\toccontents}{\\@starttoc{toc}}"              >> "$1.tex"
+	echo "\\makeatother"                                               >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\usepackage{fullpage} % Package to use full page"           >> "$1.tex"
 	echo "\\usepackage{parskip} % Package to tweak paragraph skipping" >> "$1.tex"
@@ -36,13 +41,14 @@ function create_chapter_tex_file() {
 	echo "\\author{$3}"                                                >> "$1.tex"
 	echo "\\date{$(date +%d/%m/%Y)}"                                   >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
-	echo "\\graphicspath {{\"contents/\"}}"                              >> "$1.tex"
+	echo "\\graphicspath {{\"contents/\"}}"                            >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\begin{document}"                                           >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\maketitle"                                                 >> "$1.tex"
+	echo "\\toccontents"                                               >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
-	echo "\\input{\"contents/ChapterContents.tex\"}"                     >> "$1.tex"
+	echo "\\input{\"contents/ChapterContents.tex\"}"                   >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\bibliographystyle{plain}"                                  >> "$1.tex"
 	echo "\\bibliography{bibliography.bib}"                            >> "$1.tex"

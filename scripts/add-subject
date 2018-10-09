@@ -13,7 +13,8 @@ function create_makefile() {
 	echo ""                                                                                                                                            >> makefile
 	echo "$safe.pdf: $safe.tex \$(shell find . -maxdepth 1 -type d -not -path . -exec find "{}" -type f -not -name "makefile" \; | sed 's/ /\\\\ /g')" >> makefile
 	echo -e "\tmkdir -p aux/"                                                                                                                          >> makefile
-	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ $safe.tex"                                                                         >> makefile
+	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --interaction=nonstopmode $safe.tex"                                               >> makefile
+	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --interaction=nonstopmode $safe.tex"                                               >> makefile
 	echo -e "\tcp aux/$safe.pdf $safe.pdf"                                                                                                             >> makefile
 	echo -e "\trm -rf aux/"                                                                                                                            >> makefile
 	echo ""                                                                                                                                            >> makefile
@@ -24,7 +25,11 @@ function create_makefile() {
 
 function create_subject_tex_file() {
 	cd "$2"                                                            >> /dev/null
-	echo "\\documentclass[a4paper]{report}"                            >> "$1.tex"
+	echo "\\documentclass[notitlepage]{report}"                        >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\makeatletter"                                              >> "$1.tex"
+	echo "\\newcommand*{\\toccontents}{\\@starttoc{toc}}"              >> "$1.tex"
+	echo "\\makeatother"                                               >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\usepackage{fullpage} % Package to use full page"           >> "$1.tex"
 	echo "\\usepackage{parskip} % Package to tweak paragraph skipping" >> "$1.tex"
@@ -41,6 +46,7 @@ function create_subject_tex_file() {
 	echo "\\begin{document}"                                           >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\maketitle"                                                 >> "$1.tex"
+	echo "\\toccontents"                                               >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\bibliographystyle{plain}"                                  >> "$1.tex"
 	echo "\\bibliography{bibliography.bib}"                            >> "$1.tex"

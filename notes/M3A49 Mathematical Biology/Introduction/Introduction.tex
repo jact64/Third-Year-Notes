@@ -1,4 +1,8 @@
-\documentclass[a4paper]{article}
+\documentclass[notitlepage]{article}
+
+\makeatletter
+\newcommand*{\toccontents}{\@starttoc{toc}}
+\makeatother
 
 \usepackage{fullpage} % Package to use full page
 \usepackage{parskip} % Package to tweak paragraph skipping
@@ -15,6 +19,7 @@
 \begin{document}
 
 \maketitle
+\toccontents
 
 \input{"contents/ChapterContents.tex"}
 

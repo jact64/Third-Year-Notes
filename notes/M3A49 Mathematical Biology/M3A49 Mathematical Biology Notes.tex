@@ -1,4 +1,8 @@
-\documentclass[a4paper]{report}
+\documentclass[notitlepage]{report}
+
+\makeatletter
+\newcommand*{\toccontents}{\@starttoc{toc}}
+\makeatother
 
 \usepackage{fullpage} % Package to use full page
 \usepackage{parskip} % Package to tweak paragraph skipping
@@ -10,17 +14,18 @@
 \author{James Tavernor}
 \date{09/10/2018}
 
-\graphicspath {{"Deterministic Populations/contents/"}{"Introduction/contents/"}}
+\graphicspath {{"Deterministic Population Dynamics/contents/"}{"Introduction/contents/"}}
 
 \begin{document}
 
 \maketitle
+\toccontents
 
 \chapter{Introduction}
 \input{"Introduction/contents/ChapterContents.tex"}
 
-\chapter{Deterministic Populations}
-\input{"Deterministic Populations/contents/ChapterContents.tex"}
+\chapter{Deterministic Population Dynamics}
+\input{"Deterministic Population Dynamics/contents/ChapterContents.tex"}
 
 \bibliographystyle{plain}
 \bibliography{bibliography.bib}
