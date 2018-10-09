@@ -1,1 +1,32 @@
-TODO: Write Chapter Contents
+\section{Single Population}
+In this chapter we consider (the univariate case) a population of individuals $N(t)$ which is a continuous differentiable function of time.\\
+We might worry that $N$ should be integer values, i.e. not continuous.
+\subsection{Linear Growth Model (Mattheus 1798)}
+We suppose that our birth rate is proportional to our population size and is $bN(t)$ with $b > 0$\\
+and also suppose our death rate is also proportional and is $dN(t)$ with $d > 0$\\
+thus
+\begin{align*}
+  \frac{dN(t)}{dt} &= bN(t) - dN(t) = (b-d)N(t) = rN(t) = rN \\
+  N(t) &= \int rN(t)\\
+  N(t) &= N_{0}e^{rt}
+\end{align*}
+\textit{Note: N(t) will often be written as N from here on}\\
+
+There are issues with physical plausability of this model if $r > 0$ as diverging populations are rarely observed over a sustained period. Likewise $r < 0$ then we can have $n < 1$ which also doesn't really make any sense.
+
+\subsection{Logistic Growth Model (Verhulst 1836)}
+The intuition here is that excess food $\implies$ population growth. \\
+\\
+It seems reasonable to modify our growth model to have the birth rate depend on population size. Let's suppose that $F_{0}$ is a food provision rate and food is consumed at a rate proportional to population size: $eN$.
+Thus the rate of food excess is $F_{0} - eN$ and we suppose that per capita birth rate is proportional to this. \\
+Such that
+\begin{align*}
+  \frac{dN}{dt} &= \beta(F_{0} - eN)N && \beta\text{, }e > 0 \\
+  \frac{dN}{dt} &= \beta F_{0}(1 - \frac{eN}{F_{0}})N = r^{*}(1 - \frac{N}{k})N &&r^{*} = \beta F_{0}\text{, }\frac{1}{k} = \frac{e}{F_{0}}
+\end{align*}
+\textit{Note: when $\frac{N}{k} \to 0$ we see that $\frac{dN}{dt} \to r^{*}N$ so we get our linear growth model back}\\
+
+$r^{*}$ can be thought of as the linear replication rate in the setting that N is small (compared to k) and k can be thought of as a carrying capacity or typical population size.
+
+\subsubsection*{Exact Analytic Solution}
+TODO...
