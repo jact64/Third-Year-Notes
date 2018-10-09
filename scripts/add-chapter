@@ -1,0 +1,92 @@
+#!/bin/bash
+
+function print_usage() {
+	echo "Use at the top level directory of a setup subject"
+	echo "Provide two arguments -- first argument - the chapter's name"
+	echo "                         second argument - the author's name"
+}
+
+function create_makefile() {
+	cd "$1"                                                                          >> /dev/null
+	safe=$(echo $1 | sed 's/ /\\ /g')
+	echo "all: $safe.pdf"                                                            >> makefile
+	echo ""                                                                          >> makefile
+	echo "$safe.pdf: $safe.tex \$(shell find contents/ -type f | sed 's/ /\\\\ /g')" >> makefile
+	echo -e "\tmkdir -p aux/"                                                        >> makefile
+	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ $safe.tex"       >> makefile
+	echo -e "\tcp aux/$safe.pdf $safe.pdf"                                           >> makefile
+	echo -e "\trm -rf aux/"                                                          >> makefile
+	echo ""                                                                          >> makefile
+	echo "clean:"                                                                    >> makefile
+	echo -e "\trm -rf *.pdf aux/ *.log *.aux"                                        >> makefile
+	cd -                                                                             >> /dev/null
+}
+
+function create_chapter_tex_file() {
+	cd "$1"                                                            >> /dev/null
+	echo "\\documentclass[a4paper]{article}"                           >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\usepackage{fullpage} % Package to use full page"           >> "$1.tex"
+	echo "\\usepackage{parskip} % Package to tweak paragraph skipping" >> "$1.tex"
+	echo "\\usepackage{tikz} % Package for drawing"                    >> "$1.tex"
+	echo "\\usepackage{amsmath}"                                       >> "$1.tex"
+	echo "\\usepackage{hyperref}"                                      >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\title{$2}"                                                 >> "$1.tex"
+	echo "\\author{$3}"                                                >> "$1.tex"
+	echo "\\date{$(date +%d/%m/%Y)}"                                   >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\graphicspath {{\"contents/\"}}"                              >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\begin{document}"                                           >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\maketitle"                                                 >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\input{\"contents/ChapterContents.tex\"}"                     >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\bibliographystyle{plain}"                                  >> "$1.tex"
+	echo "\\bibliography{bibliography.bib}"                            >> "$1.tex"
+	echo "\\end{document}"                                             >> "$1.tex"
+	cd -                                                               >> /dev/null
+}
+
+function create_chapter_contents_file() {
+	cd "$1"                             >> /dev/null
+	mkdir contents
+	echo "TODO: Write Chapter Contents" >> contents/ChapterContents.tex
+	cd -                                >> /dev/null
+}
+
+function update_subject_tex() {
+	safe=$(echo $1 | sed 's@/@\/@')
+	sed "s/\\graphicspath {/\\graphicspath {{\"$safe\/contents\/\"}/" "$2 Notes.tex" > temp
+	mv temp "$2 Notes.tex" #done this to get around a weird windows network security permission error when using sed -i
+	sed "/bibliographystyle{plain}/i \\\\\\chapter{$1}\n\\\\input{\"$1/contents/ChapterContents.tex\"}\n" "$2 Notes.tex" > temp
+	mv temp "$2 Notes.tex"
+}
+
+subject=${PWD##*/}
+
+if [[ $# -ne 2 ]] || [ "$1" == "" ] || [ "$2" == "" ]; then
+	print_usage
+	exit 1
+fi
+if [ -d "$1" ]; then
+	echo "Chapter already exists, please enter a unique chapter name"
+	exit 1
+fi
+if [ ! -f "makefile" ] || [ ! -f "$subject Notes.tex" ]; then
+	echo "Not in subject directory, please navigate to the top layer of a subject directory and retry"
+	exit 1
+fi
+
+chapterName=$1
+mkdir "$chapterName"
+
+create_makefile "$chapterName"
+
+create_chapter_tex_file "$chapterName" "$1" "$2"
+
+create_chapter_contents_file "$chapterName"
+
+update_subject_tex "$chapterName" "$subject"

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+function print_usage() {
+	echo "Use at any directory to create a subject directory"
+	echo "Provide two arguments -- first argument - the subject's name"
+	echo "                         second argument - the author's name"
+}
+
+function create_makefile() {
+	cd "$1"                                                                                                                                            >> /dev/null
+	safe=$(echo $2 | sed 's/ /\\ /g')
+	echo "all: $safe.pdf"                                                                                                                              >> makefile
+	echo ""                                                                                                                                            >> makefile
+	echo "$safe.pdf: $safe.tex \$(shell find . -maxdepth 1 -type d -not -path . -exec find "{}" -type f -not -name "makefile" \; | sed 's/ /\\\\ /g')" >> makefile
+	echo -e "\tmkdir -p aux/"                                                                                                                          >> makefile
+	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ $safe.tex"                                                                         >> makefile
+	echo -e "\tcp aux/$safe.pdf $safe.pdf"                                                                                                             >> makefile
+	echo -e "\trm -rf aux/"                                                                                                                            >> makefile
+	echo ""                                                                                                                                            >> makefile
+	echo "clean:"                                                                                                                                      >> makefile
+	echo -e "\trm -rf *.pdf aux/ *.log *.aux"                                                                                                          >> makefile
+	cd -                                                                                                                                               >> /dev/null
+}
+
+function create_subject_tex_file() {
+	cd "$2"                                                            >> /dev/null
+	echo "\\documentclass[a4paper]{report}"                            >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\usepackage{fullpage} % Package to use full page"           >> "$1.tex"
+	echo "\\usepackage{parskip} % Package to tweak paragraph skipping" >> "$1.tex"
+	echo "\\usepackage{tikz} % Package for drawing"                    >> "$1.tex"
+	echo "\\usepackage{amsmath}"                                       >> "$1.tex"
+	echo "\\usepackage{hyperref}"                                      >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\title{$2}"                                                 >> "$1.tex"
+	echo "\\author{$3}"                                                >> "$1.tex"
+	echo "\\date{$(date +%d/%m/%Y)}"                                   >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\graphicspath {}"                                           >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\begin{document}"                                           >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\maketitle"                                                 >> "$1.tex"
+	echo ""                                                            >> "$1.tex"
+	echo "\\bibliographystyle{plain}"                                  >> "$1.tex"
+	echo "\\bibliography{bibliography.bib}"                            >> "$1.tex"
+	echo "\\end{document}"                                             >> "$1.tex"
+	cd -                                                               >> /dev/null
+}
+
+if [[ $# -ne 2 ]] || [ "$1" == "" ] || [ "$2" == "" ]; then
+	print_usage
+	exit 1
+fi
+if [ -d "$1" ]; then
+	echo "Subject already exists, please enter a unique subject name"
+	exit 1
+fi
+
+subjectName=$1
+fileName="$1 Notes"
+mkdir "$subjectName"
+
+create_makefile "$subjectName" "$fileName"
+
+create_subject_tex_file "$fileName" "$subjectName" "$2"
