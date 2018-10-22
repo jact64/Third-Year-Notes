@@ -1,0 +1,241 @@
+\section{Multiplication}
+\vspace{-1em}
+\begin{align*}
+  x:\ &n \text{ column vector } \inset{C}[n]\\
+  A:\ &m\times n \text{ matrix with } m \text{ columns and } n \text{ rows } \inset{C}[m][n]
+\end{align*}
+\subsection{Matrix-Vector Multiplication} \label{matrix-vector-mult}
+\begin{align*}
+  b& = Ax \where{$b$: $m$ column vector $\inset{C}[m]$} \\
+  b_{i}& = \sum_{j=1}^{n}a_{ij}x_{j} && i = 1,\dots,m
+\end{align*}
+The map $x \to Ax$ is \underline{linear} since
+\begin{align*}
+  A(x + y) &= Ax + Ay \\
+  A(\alpha x) &= \alpha Ax \where{$x$, $y$ $\inset{C}[n]$, $\alpha \inset{C}$}
+\end{align*}
+We can write matrix-vector multiplication in a slightly different way.
+\begin{align*}
+  b &= \sum_{j=1}^{n}x_{j}a_{j} \where{$a_{j}$ is the $j^{th}$ column of $A$}\\
+  \addlabel{\matrix{b}}{Vector b} &= x_{1}\matrix{a_{1}} + x_{2}\matrix{a_{2}} + \dots + x_{n}\matrix{a_{n}}
+\end{align*}
+$b$ is a linear combination of the columns of A.
+\subsection{Matrix-Matrix Multiplication}
+\begin{align*}
+  A:\ &l\times m\\
+  C:\ &m\times n\\
+  B:\ &l\times n\\
+  B = &AC
+\end{align*}
+Following from \nameref{matrix-vector-mult} we can see it as.
+\begin{enumerate}
+  \item $b_{ij} = \sum_{k=1}^{m}a_{ik}c_{kj}$
+  \item $b_{j} = Ac_{j} = \sum_{k=1}^{m}c_{kj}a_{k}$
+\end{enumerate}
+\example{Outer Product}{
+  for $u \inset{C}[m]$, $v \inset{C}[n]$
+  \begin{align*}
+    uv^{\top} &= \matrix{u}\matrix{v_{1} & \aug & v_{2} & \aug & \dots & \aug & v_{n}} \\
+    &= \addlabel{\matrix{v_{1}u & \aug & v_{2} & \aug & \dots & \aug & v_{n}u}}{Columns of $uv^{\top}$}
+  \end{align*}
+  This is a \underline{Rank-1 Matrix}
+}
+\definition{Range($A$)}{The Range($A$) is the set of vectors that can be expressed as $Ax$ for some $x$.}
+\theorem{Range - Columns}{The Range of $A$, Range($A$), is the space spanned by the columns of $A$.}
+\definition{Null($A$)}{The Null Space of $A$, Null($A$), is the set of vectors, $x$, that satisfy $Ax = 0$.}
+\definition{Rank($A$)}{The Rank of $A$, Rank($A$), is the dimension of the column space of $A$.}
+\textit{Hence earlier, the emphasis on the Rank-1 Matrix, this is linear combinations of the same vector and so lie on the same line.}\\
+A matrix $A$ of size $m\times n$ is \underline{Full Rank} if it has the maximum possible rank. (the lesser of $m$ and $n$)\\
+If $m \ge n$ then in order to be full rank $A$ must have $n$ linearly independent columns to be full rank.\\
+\theorem{Full Rank - Mapping}{A matrix $A \inset{C}[m][n]$ with $m \ge n$ has full rank iff it maps no two distinct vectors to the same vector.}
+\subsection{Inverse}
+A \underline{non-singular} or \underline{invertible} matrix is a square matrix of size $m\times m$ of Full Rank which implies the columns provide a basis for $\set{C}[m]$. Hence we can write
+\begin{equation*}
+  \fixedlabel{e_{j}}{unit vector with $1$ in the $j^{\text{th}}$ entry} = \sum_{i=1}^{m} z_{ij}a_{i}
+\end{equation*}
+\begin{equation*}
+  \matrix{e_{1} & \aug & e_{2} & \aug & \dots & \aug & e_{m}} = \addtoplabel{I}{$m\times n$ identity} = A\addlabel{Z}{$A^{-1}$ by definition}
+\end{equation*}
+\theorem{For $A \inset{C}[m][m]$ the following are equivalent}{
+  \begin{enumerate}[label=(\alph*)]
+    \item $A$ has an inverse $A^{-1}$
+    \item Rank($A$) $=$ $m$
+    \item Range($A$) $=$ $\set{C}[m]$
+    \item Null($A$) $=$ $\{0\}$
+    \item $0$ is not an eigenvalue of $A$
+    \item $0$ is not a singular value of $A$
+    \item Det($A$) $\ne$ $0$ \noteit{(Determinant($A$) $\ne$ $0$)}
+  \end{enumerate}
+}
+Since $x = A^{-1}b$ is the vector of coefficients of the unique linear expansion of $b$ in the basis of the columns of $A$, multiplication by $A^{-1}$ can be viewed as a \underline{change of basis}.\\
+\begin{figure}[!ht]
+  \centering
+  \begin{tikzpicture}
+    [
+      group/.style={ellipse, draw, minimum height=100pt, minimum width=60pt, text width=40pt, align=center}
+    ]
+    \node (A) [anchor=west, group] {$b$\\$b$ in the basis $e_{i}$};
+    \node (B) [right=5cm of A, group] {$A^{-1}b$\\$b$ in the basis $a_{i}$};
+    \draw [bend left, ->, shorten >=2pt, shorten <=2pt] (A) to node [auto] {$A^{-1}$} (B);
+    \draw [bend left, ->, shorten >=2pt, shorten <=2pt] (B) to node [auto] {$A$} (A);
+  \end{tikzpicture}
+\end{figure}
+\section{Unitary (Orthogonal) Vectors and Matrices}
+\definition{Adjoint or Hermitian Conjugate of $A$}{
+  The \underline{Adjoint} or \underline{Hermitian Conjugate} of a matrix $A \inset{C}[m][n]$ we write as $A^{*} \inset{C}[n][m]$\\where $a^{*}_{ij} = \overline{a}_{ji}$ \noteit{(The complex conjugate of $a_{ji}$)}
+}
+\example{Adjoint/Hermitian Conjugate}{
+  \begin{align*}
+    A &= \matrix{a_{11} & a_{12} \\ a_{21} & a_{22} \\ a_{31} & a_{32}}\\
+    A^{*} &= \matrix{\overline{a}_{11} & \overline{a}_{21} & \overline{a}_{31} \\ \overline{a}_{12} & \overline{a}_{22} & \overline{a}_{32}}
+  \end{align*}
+}
+If $A = A^{*}$ we say $A$ is \underline{Hermitian}.\\
+For real matrices $A^{*} = A^{\top}$.\\
+If $A = A^{\top}$ we say $A$ is \underline{Symmetric}.\\
+For matrices $A,\ B$ with compatibles dimensions.
+\begin{equation*}
+  (AB)^{*} = B^{*}A^{*}
+\end{equation*}
+\subsection{Inner Product}
+\definition{The Inner Product}{
+  For $x,\ y \inset{C}[m]$ we define the inner product to be
+  \begin{equation*}
+    x^{*}y = \sum_{i = 1}{m}\overline{x}_{i}y_{i}
+  \end{equation*}
+}
+\definition{The Euclidean Length of a Vector (The Euclidean Norm)}{
+  For $x \inset{C}[m]$ we define the euclidean length of x to be
+  \begin{equation*}
+    \norm{x} = \sqrt{x^{*}x}
+  \end{equation*}
+}[euclidean-norm]
+The Inner Product is bilinear -
+\begin{itemize}
+  \item $(x_{1} + x_{2})^{*}y = x_{1}^{*}y + x_{2}^{*}y$.
+  \item $x^{*}(y_{1} + y_{2}) = x^{*}y_{1} + x^{*}y_{2}$.
+  \item $(\alpha x)^{*}(\beta y) = \overline{\alpha}\beta x^{*}y$.
+\end{itemize}
+\subsection{Orthogonal Vectors}
+\definition{Orthogonal and Orthonormal sets}{
+  \begin{itemize}
+    \item $x,\ y \inset{C}[m]$ are orthogonal if $x^{*}y = 0$.
+    \item Sets of vectors $X$ and $Y$ are orthogonal if $x^{*}y = 0,\ \forall x \in X,\ y \in Y$.
+    \item A set of vectors $S$ is itself orthogonal if $\forall x,\ y \in S:\ x \ne y,\ x^{*}y = 0$.
+    \item The set $S$ is \underline{orthonormal} if we also have $\norm{x} = 1,\ \forall x \in S$.
+  \end{itemize}
+}
+\theorem{Orthogonal Sets and Linear Independence}{
+  The vectors in an orthogonal set, $S$, are linearly independent.
+}
+\subsection{Components of a Vector}
+We have $\vectorsetextra{q}$, an orthonormal set of vectors, and $V$ is an arbitrary vector. (All vectors $\inset{C}[m]$)\\[2\baselineskip]
+
+\textbf{\underline{Define:}}\\
+\begin{equation*}
+  r = v - (q_{1}^{*}v)q_{1} - \dots - (q_{n}^{*}v)q_{n}\\[2\baselineskip]
+\end{equation*}
+\centre{$r$ is orthogonal to the set $\vectorset{q}$ since}
+\begin{equation*}
+  q_{i}^{*}r = q_{i}^{*}v - (q_{1}^{*}v)(q_{i}^{*}q_{1}) - \dots - (q_{n}^{*}v)(q_{i}^{*}q_{n})\\
+\end{equation*}
+\centre{and since $q_{i}^{*}q_{j} = 0$ for $i \ne j$}
+\centre{and $q_{i}^{*}q_{i}^{*} = 1$\\[2\baselineskip]}
+\begin{equation*}
+  \therefore q_{i}^{*}r = q_{i}^{*}v - (q_{i}^{*}v)(q_{i}^{*}q_{i}) = 0
+\end{equation*}
+
+\textbf{\underline{Thus:}}\\
+\begin{align*}
+  v &= r + \sum_{i=1}^{n}\stretchlabel{(q_{i}^{*}v)}{coefficients}\stretchtoplabel{q_{i}}{vector}\\
+  v &= r + \sum_{i=1}^{n}\stretchlabel{(q_{i}q_{i}^{*})}{rank 1}v
+\end{align*}
+If $\{q_{i}\}$ is a basis for $\set{C}[m]$, then we know $n = m$ and $r = 0$, thus,
+\begin{equation*}
+  v = \sum_{i=1}^{m}\stretchlabel{(q_{i}q_{i}^{*})}{projector}v
+\end{equation*}
+
+\subsection{Unitary Matrices}
+\definition{Unitary Matrix}{
+$Q \inset{C}[m][m]$ is unitary if
+\begin{equation*}
+  Q^{*} = Q^{-1}
+\end{equation*}
+}
+
+\definition{Orthogonal Matrix}{
+For real matrices a matrix is orthogonal if
+\begin{equation*}
+  Q^{\top} = Q^{-1} \hfill (Q \inset{R}[m][m])
+\end{equation*}
+}
+
+\example{Unitary Matrix}{
+  \begin{align*}
+    Q =& \matrix{q_{1} & \aug & q_{2} & \aug & \dots & \aug & q_{m}} \\
+    Q^{*}Q =& \matrix{q_{1}^{*} \\ \haug \\ q_{2}^{*} \\ \haug \\ \dots \\ \haug \\ q_{m}^{*}} \matrix{q_{1} & \aug & q_{2} & \aug & \dots & \aug & q_{m}} \\
+    =& I
+  \end{align*}
+  This holds if $q_{i}^{*}q_{j} = \delta_{ij}$ \\
+  where $\delta_{ij}$ is the kronecker delta, \begin{minipage}[t]{0.3\linewidth}$\delta_{ij} = 1,\ i=j$\newline $\delta_{ij} = 0,\ i \ne j$\end{minipage}\\
+  \begin{center}
+    \begin{tikzpicture}
+      [
+        group/.style={ellipse, draw, minimum height=100pt, minimum width=60pt, text width=40pt, align=center}
+      ]
+      \node (A) [anchor=west, group] {$b$\\$b$ in the basis $e_{i}$};
+      \node (B) [right=5cm of A, group] {$Q^{*}b$\\$b$ in the basis $q_{i}$};
+      \draw [bend left, ->, shorten >=2pt, shorten <=2pt] (A) to node [auto] {$Q^{*}$} (B);
+      \draw [bend left, ->, shorten >=2pt, shorten <=2pt] (B) to node [auto] {$Q$} (A);
+    \end{tikzpicture}
+  \end{center}
+}
+\subsubsection{Other properties of unitary matrices}
+\begin{itemize}
+  \item $\norm{Qx} = \norm{x}$
+  \item $(Qx)^{*}(Qy) = x^{*}y$
+\end{itemize}
+
+\section{Vector Norms}
+\subsection{Definition}
+\definition{Vector Norm}{
+  Vector norms are the measure of the "length" of a vector.\\
+  A \underline{norm} is a function $\norm{\cdot}:\ \set{C}[m] \to \set{R}$ that satisfies
+  \begin{enumerate}
+    \item $\norm{x} \ge 0$ and $\norm{x} = 0$ if and only if $x = \underline{0}$
+    \item $\norm{x + y} \le \norm{x} + \norm{y}$ (the triangle inequality)
+    \item $\norm{\alpha x} = \abs{\alpha}\norm{x}$
+  \end{enumerate}
+  $\forall x,\ y \inset{C}[m]$ and $\alpha \inset{C}$
+}
+We have already seen the euclidean norm (see \ref{euclidean-norm} $\norm{x} = \sqrt{x^{*}x}$).
+But this is only part of a larger class of norms called P-Norms.
+\definition{P-Norms}{
+  The set of P-Norms is defined as
+  \begin{equation*}
+    \{x \mid \norm{x} \le 1,\ x \inset{R}[2]\}
+  \end{equation*}
+}
+\begin{itemize}
+  \item $\norm{x}[1] = \sum_{i=1}^{m}\abs{x_{i}}$
+  \item $\norm{x}[2] = \big(\sum_{i=1}^{m}\abs{x_{i}}^{2}\big)^{\frac{1}{2}}$ this is the euclidean norm
+  \item $\norm{x}[\inf] = \max_{1 \le i \le m} \abs{x_{i}}$
+  \item $\norm{x}[p] = \big(\sum_{i=1}^{m}\abs{x_{i}}^{p}\big)^{\frac{1}{p}}$ this is the p-norm
+\end{itemize}
+\large ADD GRRAPHS TOMORROW
+\definition{Weighted Norm}{
+  \begin{equation*}
+    \norm{x}[w] = \addlabel{\norm{Wx}}{$w$ is a diagonal matrix with $w_{ij} \ne 0 \forall i$}
+  \end{equation*}
+}
+\definition{Weighted 2-Norm}{
+  \begin{equation*}
+    \norm{x}[w, 2] = \big(\sum_{i=1}^{m}\abs{w_{ii}x_{i}}^{2}\big)^{\frac{1}{2}}
+  \end{equation*}
+}
+\section{Projectors}
+A projector, $P$, is a square matrix that satisfies
+\begin{equation*}
+  P^{2} = P
+\end{equation*}
+\noteit{Also said to be \underline{idempotent}}

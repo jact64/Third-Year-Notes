@@ -1,0 +1,63 @@
+\usepackage{fullpage} % Package to use full page
+\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usetikzlibrary{shapes,positioning,fit,calc}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xifthen}
+\usepackage{dsfont}
+\usepackage{xparse}
+\usepackage{etoc}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{bookmark}
+\DeclareDocumentCommand{\set}{m o o}{%
+\IfNoValueTF{#2}{%
+%no second argument
+\mathds{#1}
+}{%
+\IfNoValueTF{#3}{%
+%no third argument
+\mathds{#1}^{#2}
+}{%
+%all argument exists
+\mathds{#1}^{#2\times #3}
+}%
+}%
+}
+\DeclareDocumentCommand{\inset}{m o o}{%
+\in \set{#1}[#2][#3]
+}
+\DeclareDocumentCommand{\addlabel}{m m}{\underbrace{#1}_{\mathclap{\text{#2}}}}
+\DeclareDocumentCommand{\addtoplabel}{m m}{\overbrace{#1}^{\mathclap{\text{#2}}}}
+\DeclareDocumentCommand{\fixedlabel}{m m O{70pt}}{\underbrace{#1}_{\parbox{#3}{\centering#2}}}
+\DeclareDocumentCommand{\fixedtoplabel}{m m O{70pt}}{\overbrace{#1}^{\parbox{#3}{\centering#2}}}
+\DeclareDocumentCommand{\stretchlabel}{m m}{\underbrace{#1}_{\text{#2}}}
+\DeclareDocumentCommand{\stretchtoplabel}{m m}{\overbrace{#1}^{\text{#2}}}
+\DeclareDocumentCommand{\custombox}{m m m o O{black!50!gray} O{white} O{black!50!gray}}{%
+\IfNoValueTF{#4}{%
+\begin{tcolorbox}[title={\subsubsection{#1: #2}}, colbacktitle=#5, coltitle=#6, colframe=#7]%
+  #3%
+\end{tcolorbox}%
+}{%
+\begin{tcolorbox}[title={\subsubsection{#1: #2}}, label=#4, colbacktitle=#5, coltitle=#6, colframe=#7]%
+  #3%
+\end{tcolorbox}%
+}%
+}
+\DeclareDocumentCommand{\example}{m m o}{\custombox{Example}{#1}{#2}[#3]}
+\DeclareDocumentCommand{\definition}{m m o}{\custombox{Definition}{#1}{#2}[#3][black!50!red][white][black!50!red]}
+\DeclareDocumentCommand{\theorem}{m m o}{\custombox{Theorem}{#1}{#2}[#3][black!25!gray][white][black!25!gray]}
+\newcommand\aug{\fboxsep=-\fboxrule\!\!\!\fbox{\strut}\!\!\!}
+\newcommand\haug{\rule[.5ex]{3.5em}{0.4pt}}
+\DeclareDocumentCommand{\matrix}{m}{\begin{bmatrix}#1\end{bmatrix}}
+\DeclareDocumentCommand{\note}{m O{gray}}{\textcolor{#2}{#1}}
+\DeclareDocumentCommand{\noteit}{m O{gray}}{\textit{\note{#1}{#2}}}
+\DeclareDocumentCommand{\where}{m}{&& \text{Where #1}}
+\DeclareDocumentCommand{\norm}{m O{}}{\lVert#1\rVert_{#2}}
+\DeclareDocumentCommand{\abs}{m}{\left|#1\right|}
+\DeclareDocumentCommand{\vectorset}{m O{n}}{\{#1_{1}, \dots, #1_{#2}\}}
+\DeclareDocumentCommand{\vectorsetextra}{m O{n}}{\{#1_{1}, #1_{2}, \dots, #1_{#2}\}}
+\DeclareDocumentCommand{\centre}{m}{\begin{center}#1\end{center}}
