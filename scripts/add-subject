@@ -6,12 +6,27 @@ function print_usage() {
 	echo "                         second argument - the author's name"
 }
 
+function sanitize_latex() {
+	safe=$(echo $1 | sed -e 's/\\/\\textbackslash{}/g')
+	safe=$(echo $safe | sed -e 's/\^/\\textasciicircum{}/g')
+	safe=$(echo $safe | sed -e 's/~/\\textasciitilde{}/g')
+	safe=$(echo $safe | sed -e 's/</\\textless{}/g')
+	safe=$(echo $safe | sed -e 's/>/\\textgreater{}/g')
+	safe=$(echo $safe | sed -e 's/|/\\textbar{}/g')
+	safe=$(echo $safe | sed -e 's/"/\\textquotedbl{}/g')
+	safe=$(echo $safe | sed -e "s/'/\\\\textquotesingle{}/g")
+	safe=$(echo $safe | sed -e 's/`/\\textasciigrave{}/g')
+	safe=$(echo $safe | sed -e 's/[$&{}#_%]/\\&/g')
+	safe=$(echo $safe | sed -e 's/\(\\[a-z]\+\)\\{\\}/\1{}/g')
+	echo $safe
+}
+
 function create_makefile() {
 	cd "$1"                                                                                                                                            >> /dev/null
 	safe=$(echo $2 | sed 's/ /\\ /g')
 	echo "all: $safe.pdf"                                                                                                                              >> makefile
 	echo ""                                                                                                                                            >> makefile
-	echo "$safe.pdf: $safe.tex \$(shell find . -maxdepth 1 -type d -not -path . -exec find "{}" -type f -not -name "makefile" \; | sed 's/ /\\\\ /g')" >> makefile
+	echo "$safe.pdf: $safe.tex resources.tex \$(shell find . -maxdepth 1 -type d -not -path . -exec find "{}" -type f -not -name "makefile" \; | sed 's/ /\\\\ /g')" >> makefile
 	echo -e "\tmkdir -p aux/"                                                                                                                          >> makefile
 	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --interaction=nonstopmode $safe.tex"                                               >> makefile
 	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --interaction=nonstopmode $safe.tex"                                               >> makefile
@@ -23,7 +38,23 @@ function create_makefile() {
 	cd -                                                                                                                                               >> /dev/null
 }
 
+function create_resources_tex_file() {
+	cd "$1"                                                            >> /dev/null
+	echo "\\usepackage{fullpage} % Package to use full page"           >> "resources.tex"
+	echo "\\usepackage{parskip} % Package to tweak paragraph skipping" >> "resources.tex"
+	echo "\\usepackage{tikz} % Package for drawing"                    >> "resources.tex"
+	echo "\\usepackage{amsmath}"                                       >> "resources.tex"
+	echo "\\usepackage{hyperref}"                                      >> "resources.tex"
+	echo "\\usepackage{xifthen}"                                       >> "resources.tex"
+	echo "\\usepackage{dsfont}"                                        >> "resources.tex"
+	echo "\\usepackage{xparse}"                                        >> "resources.tex"
+	echo "\\usepackage{etoc}"                                          >> "resources.tex"
+	cd -                                                               >> /dev/null
+}
+
 function create_subject_tex_file() {
+	safeTitle=$(sanitize_latex "$2")
+	safeAuthor=$(sanitize_latex "$3")
 	cd "$2"                                                            >> /dev/null
 	echo "\\documentclass[notitlepage]{report}"                        >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
@@ -31,14 +62,10 @@ function create_subject_tex_file() {
 	echo "\\newcommand*{\\toccontents}{\\@starttoc{toc}}"              >> "$1.tex"
 	echo "\\makeatother"                                               >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
-	echo "\\usepackage{fullpage} % Package to use full page"           >> "$1.tex"
-	echo "\\usepackage{parskip} % Package to tweak paragraph skipping" >> "$1.tex"
-	echo "\\usepackage{tikz} % Package for drawing"                    >> "$1.tex"
-	echo "\\usepackage{amsmath}"                                       >> "$1.tex"
-	echo "\\usepackage{hyperref}"                                      >> "$1.tex"
+	echo "\\input{\"resources.tex\"}"                                  >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
-	echo "\\title{$2}"                                                 >> "$1.tex"
-	echo "\\author{$3}"                                                >> "$1.tex"
+	echo "\\title{$safeTitle}"                                         >> "$1.tex"
+	echo "\\author{$safeAuthor}"                                       >> "$1.tex"
 	echo "\\date{$(date +%d/%m/%Y)}"                                   >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\graphicspath {}"                                           >> "$1.tex"
@@ -47,6 +74,8 @@ function create_subject_tex_file() {
 	echo ""                                                            >> "$1.tex"
 	echo "\\maketitle"                                                 >> "$1.tex"
 	echo "\\toccontents"                                               >> "$1.tex"
+  echo "\\etocsettocstyle{}{} % from now on only local tocs"         >> "$1.tex"
+	echo "\\etocsettocdepth{5}"                                        >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\bibliographystyle{plain}"                                  >> "$1.tex"
 	echo "\\bibliography{bibliography.bib}"                            >> "$1.tex"
@@ -68,5 +97,7 @@ fileName="$1 Notes"
 mkdir "$subjectName"
 
 create_makefile "$subjectName" "$fileName"
+
+create_resources_tex_file "$subjectName"
 
 create_subject_tex_file "$fileName" "$subjectName" "$2"
