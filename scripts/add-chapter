@@ -22,15 +22,15 @@ function sanitize_latex() {
 }
 
 function create_makefile() {
-	cd "$1"                                                                                              >> /dev/null
-	safe=$(echo $1 | sed 's/ /\\ /g')
+	cd "$2"                                                                                              >> /dev/null
+	safe=$(echo $2 | sed 's/ /\\ /g')
 	echo "all: $safe.pdf"                                                                                >> makefile
 	echo ""                                                                                              >> makefile
 	echo "$safe.pdf: $safe.tex ../resources.tex \$(shell find contents/ -type f | sed 's/ /\\\\ /g')"                     >> makefile
 	echo -e "\tmkdir -p aux/"                                                                            >> makefile
 	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --interaction=nonstopmode $safe.tex" >> makefile
 	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --ubteraction=nonstopmode $safe.tex" >> makefile
-	echo -e "\tcp aux/$safe.pdf $safe.pdf"                                                               >> makefile
+	echo -e "\tcp aux/$safe.pdf $1.pdf"                                                                  >> makefile
 	echo -e "\trm -rf aux/"                                                                              >> makefile
 	echo ""                                                                                              >> makefile
 	echo "clean:"                                                                                        >> makefile
@@ -61,7 +61,7 @@ function create_chapter_tex_file() {
 	echo "\\maketitle"                                                 >> "$1.tex"
 	echo "\\toccontents"                                               >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
-	echo "\\input{\"contents/ChapterContents.tex\"}"                   >> "$1.tex"
+	echo "\\subimport{contents/}{ChapterContents.tex}"                 >> "$1.tex"
 	echo ""                                                            >> "$1.tex"
 	echo "\\bibliographystyle{plain}"                                  >> "$1.tex"
 	echo "\\bibliography{bibliography.bib}"                            >> "$1.tex"
@@ -78,10 +78,12 @@ function create_chapter_contents_file() {
 
 function update_subject_tex() {
 	safe=$(echo $1 | sed -e 's/[\/&]/\\&/g')
+	folder=$3
+	folderSafe=$(echo $folder | sed -e 's/[\/&]/\\&/g')
 	safeTitle=$(sanitize_latex "$1" | sed -e 's/[\/&]/\\&/g')
-	sed "s/\\graphicspath {/\\graphicspath {{\"$safe\/contents\/\"}/" "$2 Notes.tex" > temp
+	sed "s/\\graphicspath {/\\graphicspath {{\"$folderSafe\/contents\/\"}/" "$2 Notes.tex" > temp
 	mv temp "$2 Notes.tex" #done this to get around a weird windows network security permission error when using sed -i
-	sed "/bibliographystyle{plain}/i \\\\\\chapter{$safeTitle}\n\\\\localtableofcontents\n\\\\input{\"$1/contents/ChapterContents.tex\"}\n" "$2 Notes.tex" > temp
+	sed "/bibliographystyle{plain}/i \\\\\\chapter{$safeTitle}\n\\\\localtableofcontents\n\\\\subimport{$folder/contents/}{ChapterContents.tex}\n" "$2 Notes.tex" > temp
 	mv temp "$2 Notes.tex"
 }
 
@@ -91,7 +93,9 @@ if [[ $# -ne 2 ]] || [ "$1" == "" ] || [ "$2" == "" ]; then
 	print_usage
 	exit 1
 fi
-if [ -d "$1" ]; then
+chapterName=$1
+noSpaceChapterName=$(echo $chapterName | sed -e 's/ //g')
+if [ -d "$noSpaceChapterName" ]; then
 	echo "Chapter already exists, please enter a unique chapter name"
 	exit 1
 fi
@@ -100,13 +104,12 @@ if [ ! -f "makefile" ] || [ ! -f "$subject Notes.tex" ]; then
 	exit 1
 fi
 
-chapterName=$1
-mkdir "$chapterName"
+mkdir "$noSpaceChapterName"
 
-create_makefile "$chapterName"
+create_makefile "$chapterName" "$noSpaceChapterName"
 
-create_chapter_tex_file "$chapterName" "$1" "$2"
+create_chapter_tex_file "$noSpaceChapterName" "$1" "$2"
 
-create_chapter_contents_file "$chapterName"
+create_chapter_contents_file "$noSpaceChapterName"
 
-update_subject_tex "$chapterName" "$subject"
+update_subject_tex "$chapterName" "$subject" "$noSpaceChapterName"
