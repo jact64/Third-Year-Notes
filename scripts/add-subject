@@ -135,7 +135,11 @@ function create_resources_tex_file() {
         echo "    numbersep=9pt, % this defines how far the numbers are from the text" >> "resources.tex"
         echo "    emph=[1]{for,end,break},emphstyle=[1]\\color{red}, %some words to emphasise" >> "resources.tex"
         echo "    %emph=[2]{word1,word2}, emphstyle=[2]{style}," >> "resources.tex"
-        echo "}" >> "resources.tex" 
+        echo "}" >> "resources.tex"
+        echo "\\usepackage{linegoal}" >> "resources.tex"
+        echo "\\DeclareDocumentCommand{\\indent}{O{-} O{1em} O{t} m}{%" >> "resources.tex"
+	echo "\\hspace*{#2} #1 \\begin{minipage}[#3]{\\linegoal}#4\\end{minipage}\\\\%" >> "resources.tex"
+	echo "}" >> "resources.tex"
 	cd -                                                               >> /dev/null
 }
 
