@@ -24,13 +24,14 @@ function sanitize_latex() {
 function create_makefile() {
 	cd "$2"                                                                                              >> /dev/null
 	safe=$(echo $2 | sed 's/ /\\ /g')
+	out=$(echo $1 | sed 's/ /\\ /g')
 	echo "all: $safe.pdf"                                                                                >> makefile
 	echo ""                                                                                              >> makefile
 	echo "$safe.pdf: $safe.tex ../resources.tex \$(shell find contents/ -type f | sed 's/ /\\\\ /g')"                     >> makefile
 	echo -e "\tmkdir -p aux/"                                                                            >> makefile
 	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --interaction=nonstopmode $safe.tex" >> makefile
 	echo -e "\tpdflatex --aux-location=aux/ --output-directory=aux/ --ubteraction=nonstopmode $safe.tex" >> makefile
-	echo -e "\tcp aux/$safe.pdf $1.pdf"                                                                  >> makefile
+	echo -e "\tcp aux/$safe.pdf $out.pdf"                                                                >> makefile
 	echo -e "\trm -rf aux/"                                                                              >> makefile
 	echo ""                                                                                              >> makefile
 	echo "clean:"                                                                                        >> makefile
